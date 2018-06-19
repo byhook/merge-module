@@ -1,0 +1,33 @@
+apply from: '../module.gradle'
+
+apply from: '../fat-aar.gradle'
+
+apply from: '../publish.gradle'
+
+android {
+
+    libraryVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.aar')) {
+                def fileName = getArtifactFileName()
+                output.outputFile = new File(outputFile.parent, fileName)
+            }
+        }
+    }
+
+}
+
+def getArtifactFileName() {
+    return "${POM_ARTIFACT_ID}-${VERSION_NAME}.aar"
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    embedded project(':common')
+    embedded project(':upload')
+    embedded project(':download')
+    embedded project(':video')
+    embedded project(':liveroom')
+}
