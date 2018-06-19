@@ -1,1 +1,1 @@
-include ':app', ':common', ':video'
+include ':app', ':common', ':video', ':liveroom', ':upload', ':download'
