@@ -23,9 +23,18 @@ android {
 repositories {
     jcenter()
     maven {
-        name 'maven'
-        //替换自己搭建的nexus私服
+        //替换自己搭建的私服
         url "http://127.0.0.1:8081/nexus/content/repositories/releases"
+    }
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'com.android.support:appcompat-v7:25.3.1'
+        force 'com.android.support:support-annotations:25.3.1'
     }
 }
 
@@ -35,5 +44,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
 
-    compile 'com.onzhou.module:merge:1.0.0'
+    compile(name: 'merge-release', ext: 'aar')
+    //compile 'com.onzhou.module:merge:1.0.0'
+
 }
