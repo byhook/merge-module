@@ -46,7 +46,6 @@ publishing {
             pom.withXml {
                 def dependenciesNode = asNode().appendNode('dependencies')
 
-                //Iterate over the compile dependencies, adding a <dependency> node for each
                 depList.values().each {
                     ResolvedDependency dep ->
                         def hasGroup = dep.moduleGroup != null

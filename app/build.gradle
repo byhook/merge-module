@@ -44,7 +44,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
 
-    compile(name: 'merge-release', ext: 'aar')
-    //compile 'com.onzhou.module:merge:1.0.0'
+    //compile(name: 'merge-release', ext: 'aar')
+    compile 'com.onzhou.module:merge:1.0.1'
 
 }

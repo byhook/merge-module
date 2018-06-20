@@ -19,6 +19,13 @@ android {
     }
 }
 
+repositories {
+    jcenter()
+    flatDir {
+        dirs 'libs', "$rootDir/liveroom/libs"
+    }
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'

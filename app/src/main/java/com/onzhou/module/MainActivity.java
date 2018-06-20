@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void onLiveClick(View view) {
+
         LiveRoomActivity.intentStart(this);
     }
 
