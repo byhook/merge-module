@@ -87,9 +87,7 @@ ext.generated_rsrc_dir = "$build_dir/generated/source/r/release";
 ext.base_r2x_dir = "$build_dir/fat-aar/release/";
 
 def gradleVersionStr = GradleVersion.current().getVersion();
-
-//2.2以上api有变动,报错
-ext.gradleApiVersion = "2.2".toFloat();//gradleVersionStr.substring(0, gradleVersionStr.lastIndexOf(".")).toFloat();
+ext.gradleApiVersion = gradleVersionStr.substring(0, gradleVersionStr.lastIndexOf(".")).toFloat();
 
 println "Gradle version: " + gradleVersionStr;
 
@@ -113,12 +111,12 @@ afterEvaluate {
                         embeddedAarFiles.add(artifact)
                     }
                     if (!embeddedAarDirs.contains(aarPath)) {
-                        if (artifact.file.isFile()) {
+                        if( artifact.file.isFile() ){
                             println artifact.file
                             println aarPath
 
                             copy {
-                                from zipTree(artifact.file)
+                                from zipTree( artifact.file )
                                 into aarPath
                             }
                         }
@@ -146,12 +144,11 @@ afterEvaluate {
         // Embed JNI Libraries
         bundleRelease.dependsOn embedJniLibs
 
-        println("==============================" + gradleApiVersion + "==========================")
+        if(gradleApiVersion >= 2.3f) {
 
-        if (gradleApiVersion >= 2.3f) {
-            embedJniLibs.dependsOn transformNativelibsWithSyncJniLibsForRelease
+            embedJniLibs.dependsOn transformNativeLibsWithSyncJniLibsForRelease
             ext.bundle_release_dir = "$build_dir/intermediates/bundles/default"
-        } else {
+        }else{
             embedJniLibs.dependsOn transformNative_libsWithSyncJniLibsForRelease
             ext.bundle_release_dir = "$build_dir/intermediates/bundles/release";
         }
@@ -172,9 +169,6 @@ afterEvaluate {
         bundleRelease.dependsOn embedJavaJars
         embedJavaJars.dependsOn compileReleaseJavaWithJavac
 
-        //合并R文件
-        collectRClass.dependsOn compileReleaseJavaWithJavac
-
         // If proguard is enabled, run the tasks that bundleRelease should depend on before proguard
         if (tasks.findByPath('proguardRelease') != null) {
             proguardRelease.dependsOn embedJavaJars
@@ -193,26 +187,12 @@ task embedLibraryResources << {
     }
 }
 
-/**
- * 本地资源
- * 由于合并module的时候
- * 资源文件无法替换
- */
-
 private List getMergedInputResourceSets(List inputResourceSet) {
     //We need to do this trickery here since the class declared here and that used by the runtime
     //are different and results in class cast error
     def ResourceSetClass = inputResourceSet.get(0).class
 
     List newInputResourceSet = new ArrayList(inputResourceSet)
-
-    HashMap<String, String> localRes = new HashMap<String, String>()
-    String path = buildDir.path.replace("/build", "") + "/src/main/res"
-    FileTree moduleRes = fileTree(dir: path, include: '**/*.xml')
-    moduleRes.each { File file ->
-        println("路径=" + file.getAbsolutePath() + "/" + file.getName())
-        localRes.put(file.getName(), file.getAbsolutePath())
-    }
 
     println "getMergedInputResourceSets"
 
@@ -236,21 +216,13 @@ private List getMergedInputResourceSets(List inputResourceSet) {
                 if (startIndex < 1 || endIndex < 1)
                     return;
                 resname = aarPath.substring(startIndex, endIndex).replace('/', ':')
-            } else
-                resname = (aarPath.split(exploded_aar_dir)[1]).replace('/', ':');
-
-            FileTree libRes = fileTree(dir: "$aarPath/res", include: '**/*.xml')
-            libRes.each { File file ->
-                if (localRes.containsKey(file.getName())) {
-                    println("资源重复" + file.getAbsolutePath())
-                    file.delete()
-                }
             }
+            else
+                resname = (aarPath.split(exploded_aar_dir)[1]).replace('/', ':');
             def rs = ResourceSetClass.newInstance([resname, true] as Object[])
             rs.addSource(file("$aarPath/res"))
             println "ResourceSet is " + rs
             println resname
-            println "$aarPath/res"
             newInputResourceSet += rs
         } catch (Exception e) {
             e.printStackTrace();
@@ -300,7 +272,7 @@ task generateRJava << {
     def mainManifestFile = android.sourceSets.main.manifest.srcFile;
     def libPackageName = "";
 
-    if (mainManifestFile.exists()) {
+    if(mainManifestFile.exists()) {
 
         libPackageName = new XmlParser().parse(mainManifestFile).@package
     }
@@ -308,11 +280,11 @@ task generateRJava << {
     embeddedAarDirs.each { aarPath ->
 
         def manifestFile = file("$aarPath/AndroidManifest.xml");
-        if (!manifestFile.exists()) {
+        if(!manifestFile.exists()) {
             manifestFile = file("./src/main/AndroidManifest.xml");
         }
 
-        if (manifestFile.exists()) {
+        if(manifestFile.exists()) {
             def aarManifest = new XmlParser().parse(manifestFile);
             def aarPackageName = aarManifest.@package
 
@@ -394,7 +366,7 @@ task embedJavaJars(dependsOn: embedRClass) << {
         else
             jar_dir = "$aarPath/jars"
 
-        if (embeddedAarFiles.size() > 0) {
+        if(embeddedAarFiles.size() > 0){
 
             embeddedAarFiles.each {
                 artifact ->
@@ -408,7 +380,7 @@ task embedJavaJars(dependsOn: embedRClass) << {
                     }
             }
 
-        } else {
+        }else{
 
             println jar_dir
             println classs_release_dir
@@ -475,11 +447,11 @@ task embedManifests << {
     File copyManifest = file("$bundle_release_dir/AndroidManifest.orig.xml")
     File aaptManifest = file("$manifest_aaapt_dir/AndroidManifest.xml")
 
-    if (!origManifest.exists()) {
+    if(!origManifest.exists()) {
         origManifest = file("./src/main/AndroidManifest.xml")
     }
 
-    if (!origManifest.exists()) {
+    if(!origManifest.exists()) {
         return;
     }
 

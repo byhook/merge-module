@@ -6,7 +6,7 @@ apply from: '../publish.gradle'
 
 android {
 
-    libraryVariants.all { variant ->
+    /*libraryVariants.all { variant ->
         variant.outputs.each { output ->
             def outputFile = output.outputFile
             if (outputFile != null && outputFile.name.endsWith('.aar')) {
@@ -14,7 +14,7 @@ android {
                 output.outputFile = new File(outputFile.parent, fileName)
             }
         }
-    }
+    }*/
 
 }
 
