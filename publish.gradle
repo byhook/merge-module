@@ -64,11 +64,13 @@ publishing {
     }
     repositories {
         maven {
-            url "http://127.0.0.1:8081/nexus/content/repositories/releases"
-            credentials {
+            //远程maven仓库的地址如: http://127.0.0.1:8081/nexus/content/repositories/releases
+            url uri("/home/byhook/android/maven")
+            //远程仓库需要配置密钥
+            /*credentials {
                 username "admin"
                 password "haoadmin"
-            }
+            }*/
         }
     }
 }

@@ -1,15 +1,17 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.3'
-
+    //构建版本
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+    buildToolsVersion rootProject.ext.android.buildToolsVersion
+    //默认的配置
     defaultConfig {
-        applicationId "com.onzhou.module"
-        minSdkVersion 14
-        targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
+        applicationId rootProject.ext.android.applicationId
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -24,10 +26,7 @@ repositories {
     jcenter()
     maven {
         //替换自己搭建的私服
-        url "http://127.0.0.1:8081/nexus/content/repositories/releases"
-    }
-    flatDir {
-        dirs 'libs'
+        url uri("/home/byhook/android/maven")
     }
 }
 
@@ -44,7 +43,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
 
-    //compile(name: 'merge-release', ext: 'aar')
+    //先在merge目录下执行合并gradle clean asR,右侧栏目gradle选择发布到maven,再进行依赖
     compile 'com.onzhou.module:merge:1.0.1'
-
 }
